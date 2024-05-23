@@ -12,6 +12,7 @@ from ctube.errors import InvalidSyntax
 from ctube.containers import MusicItem
 from ctube.colors import color, Color
 from ctube.download import Data
+from ctube.cmds import Commands
 from ctube.helpers import (
     get_filtered_input,
     get_filtered_music_items,
@@ -26,13 +27,6 @@ from ctube.printers import (
 from ctube.extractors import (
     extract_artist_id, 
     extract_artist_music
-)
-from ctube.cmds import (
-    Commands, 
-    get_available_cmds_names, 
-    get_cmd_by_name,
-    get_cmd_with_args, 
-    is_command
 )
 
 
@@ -66,26 +60,30 @@ class App:
 
             cmd_name, args = get_filtered_input(user_input)
 
-            if cmd_name not in get_available_cmds_names():
+            if cmd_name not in [cmd.value.name for cmd in Commands]:
                 print(color(f"Invalid command: {cmd_name}", Color.RED))
                 continue
             else:
-                cmd_obj = get_cmd_by_name(cmd_name)
-                if not args and cmd_obj in get_cmd_with_args():
-                    print(color(f"Missing argument {cmd_obj.value.expected_args} for {cmd_name}", Color.RED))
+                cmd_obj = Commands.get_by_name(cmd_name)
+                if not args and cmd_obj.value.required_args > 0:
+                    print(color(
+                        "Missing argument(s) "
+                        f"{', '.join([arg.name for arg in cmd_obj.value.args])} for {cmd_name}", 
+                        Color.RED
+                    ))
                     continue
 
-            if is_command(user_input, Commands.EXIT):
+            if cmd_name == Commands.EXIT.value.name:
                 exit()
-            elif is_command(user_input, Commands.CLEAR):
+            elif cmd_name == Commands.CLEAR.value.name:
                 clear_screen()
-            elif is_command(user_input, Commands.HELP):
+            elif cmd_name == Commands.HELP.value.name:
                 print_help()
-            elif is_command(cmd_name, Commands.INFO):
+            elif cmd_name == Commands.INFO.value.name:
                 print_info(args)
-            elif is_command(cmd_name, Commands.SEARCH) or is_command(cmd_name, Commands.ID):
+            elif cmd_name in (Commands.SEARCH.value.name, Commands.ID.value.name):
                 self._do_search(cmd_name, args)
-            elif is_command(cmd_name, Commands.DOWNLOAD):
+            elif cmd_name == Commands.DOWNLOAD.value.name:
                 self._do_download(args)
             else:
                 print(color("Invalid syntax", Color.RED))
