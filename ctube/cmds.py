@@ -118,10 +118,6 @@ class Commands(Enum):
         }
     )
 
-
-def get_cmd_with_args() -> Set[Commands]:
-    return {cmd for cmd in Commands if cmd.value.required_args > 0}
-
-
-def get_cmd_by_name(cmd_name: str) -> Commands:
-    return Commands.__members__[cmd_name.replace("-", "_").upper()]
+    @classmethod
+    def get_by_name(cls, name: str) -> "Commands":
+        return cls.__members__[name.replace("-", "_").upper()]
