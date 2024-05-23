@@ -1,7 +1,7 @@
 import shutil
 from typing import List
 import ctube
-from ctube.cmds import Commands, get_cmd_by_name
+from ctube.cmds import Commands
 from ctube.colors import color, Color
 from ctube.containers import MusicItem
 
@@ -17,7 +17,7 @@ def print_header() -> None:
 
 def print_info(cmd_name: str, verbose: bool = False) -> None:
     try:
-        cmd_obj = get_cmd_by_name(cmd_name)
+        cmd_obj = Commands.get_by_name(cmd_name)
         if verbose:
             print(cmd_obj.value.long_description)
         else:
