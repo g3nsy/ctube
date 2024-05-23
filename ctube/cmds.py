@@ -108,6 +108,9 @@ class Commands(Enum):
         short_description="",
         long_description="",
         required_args=1,
+        args={
+            Argument(name="<command name>", description="", type=str)
+        },
         accepted_args={
             Argument(name="search", description="The 'search' command", type=str),
             Argument(name="id", description="The 'id' command", type=str),
