@@ -10,9 +10,8 @@ from ctube.download import Downloader
 from ctube.terminal import Prompt
 from ctube.errors import InvalidSyntax
 from ctube.containers import MusicItem
-from ctube.colors import color, Color, get_color_by_name
+from ctube.colors import color, Color
 from ctube.download import Data
-from ctube.decorators import handle_invalid_cmd_args
 from ctube.helpers import (
     get_filtered_input,
     get_filtered_music_items,
@@ -82,10 +81,6 @@ class App:
                 clear_screen()
             elif is_command(user_input, Commands.HELP):
                 print_help()
-            elif is_command(cmd_name, Commands.PROMPT_CHAR):
-                self._change_prompt(args)
-            elif is_command(cmd_name, Commands.PROMPT_COLOR):
-                self._change_prompt_color(args)
             elif is_command(cmd_name, Commands.INFO):
                 print_info(args)
             elif is_command(cmd_name, Commands.SEARCH) or is_command(cmd_name, Commands.ID):
@@ -138,14 +133,6 @@ class App:
                 print(color(f":: Downloading: {item.title}", Color.GREEN))
                 self.downloader.download(item=item, artist=self._artist_name)
                 print('\033[?25h', end="")
-
-    def _change_prompt(self, char: str) -> None:
-        self.prompt.char = char
-
-    @handle_invalid_cmd_args(cmd=Commands.PROMPT_COLOR)
-    def _change_prompt_color(self, color_name: str) -> None:
-        self.prompt.color = get_color_by_name(color_name)
-
 
 def on_progress_callback(
         data: Data,
