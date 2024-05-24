@@ -8,8 +8,8 @@ def handle_invalid_index_syntax(func: Callable) -> Callable:
     def inner(*args, **kwargs) -> None:
         try:
             return func(*args, **kwargs)
-        except InvalidIndexSyntax:
-            print(color("Invalid index syntax", Color.RED))
+        except InvalidIndexSyntax as error:
+            print(color(str(error), Color.RED))
     return inner
 
 
@@ -30,8 +30,7 @@ def handle_invalid_cmd_args(cmd: Commands) -> Callable:
         def inner(*cmd_args: str) -> Any:
             invalid_args = {cmd_arg for cmd_arg in cmd_args[1:] if cmd_arg not in accepted_args}
             if invalid_args:
-                print(color(f"Invalid arguments for command '{cmd.value.name}': {invalid_args}", Color.RED))
-                print(color(f"Accepted arguments are {accepted_args}", Color.RED))
+                print(color(f"Invalid input for command '{cmd.value.name}': {invalid_args}", Color.RED))
             else:
                 return func(*cmd_args)
         return inner
