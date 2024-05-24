@@ -8,7 +8,6 @@ from innertube.clients import InnerTube
 from innertube.errors import RequestError
 from ctube.download import Downloader
 from ctube.terminal import Prompt
-from ctube.errors import InvalidSyntax
 from ctube.containers import MusicItem
 from ctube.colors import color, Color
 from ctube.download import Data
