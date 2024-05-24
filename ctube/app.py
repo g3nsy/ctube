@@ -1,8 +1,4 @@
-import os
 import sys
-import shutil
-import pydub
-import eyed3
 from typing import List, Optional, Tuple
 from innertube.clients import InnerTube
 from innertube.errors import RequestError
@@ -10,8 +6,16 @@ from ctube.download import Downloader
 from ctube.terminal import Prompt
 from ctube.containers import MusicItem
 from ctube.colors import color, Color
-from ctube.download import Data
 from ctube.cmds import Commands
+from ctube.errors import (
+    ArtistNotFoundError,
+    ContentNotFoundError,
+    CommandNotFoundError
+)
+from ctube.callbacks import (
+    on_progress_callback, 
+    on_complete_callback
+)
 from ctube.helpers import (
     get_filtered_input,
     get_filtered_music_items,
@@ -53,12 +57,9 @@ class App:
         print_header()
         while True:
             user_input = self.prompt.get_input()
-
             if not user_input: 
                 continue
-
             cmd_name, args = get_filtered_input(user_input)
-
             if cmd_name not in [cmd.value.name for cmd in Commands]:
                 print(color(f"Invalid command: {cmd_name}", Color.RED))
                 continue
@@ -67,11 +68,10 @@ class App:
                 if not args and cmd_obj.value.required_args > 0:
                     print(color(
                         "Missing argument(s) "
-                        f"{', '.join([arg.name for arg in cmd_obj.value.args])} for {cmd_name}", 
+                        f"{', '.join([arg.name for arg in cmd_obj.value.args])} for {cmd_name}", # type: ignore
                         Color.RED
                     ))
                     continue
-
             if cmd_name == Commands.EXIT.value.name:
                 exit()
             elif cmd_name == Commands.CLEAR.value.name:
@@ -87,6 +87,23 @@ class App:
             else:
                 print(color("Invalid syntax", Color.RED))
 
+    def _search(self, artist_name: str) -> Tuple[List[MusicItem], str]:
+        data = self.client.search(artist_name)
+        artist_id = extract_artist_id(data)
+        if artist_id:
+            return self._id(artist_id)
+        else:
+            raise ArtistNotFoundError
+
+    def _id(self, artist_id: str) -> Tuple[List[MusicItem], str]:
+        data = self.client.browse(artist_id)
+        artist_music_data = extract_artist_music(data)
+        artist_music_data: Optional[Tuple[List[MusicItem], str]]
+        if artist_music_data:
+            return artist_music_data
+        else:
+            raise ContentNotFoundError
+
     def _do_search(self, mode: str, arg: str) -> Optional[Tuple[List[MusicItem], str]]:
         if mode == "search":
             data = self.client.search(query=arg)
@@ -97,7 +114,7 @@ class App:
         elif mode == "id":
             artist_id = arg
         else:
-            raise InvalidSyntax
+            raise CommandNotFoundError
         try:
             artist_music_data = self.client.browse(browse_id=f"MPAD{artist_id}")
         except RequestError:
@@ -130,53 +147,6 @@ class App:
                 print(color(f":: Downloading: {item.title}", Color.GREEN))
                 self.downloader.download(item=item, artist=self._artist_name)
                 print('\033[?25h', end="")
-
-def on_progress_callback(
-        data: Data,
-        filesize: int, 
-        bytes_received: int, 
-) -> None:
-    columns = shutil.get_terminal_size().columns
-    max_width = int(columns * 0.40)
-    filled = int(round(max_width * bytes_received / float(filesize)))
-    remaining = max_width - filled
-    progress_bar = "#" * filled + "-" * remaining
-    percent = round(100.0 * bytes_received / float(filesize), 1)
-
-    distance_from_bar = columns - (max_width + 9)  # len bar + percentage len
-    title = f":: {data.title} "
-
-    if len(title) > distance_from_bar:
-        title = f"{title[:distance_from_bar - 4]}... "
-    else:
-        title = f"{title}{' ' * (distance_from_bar - len(title))}"
-
-    text = f"{title}[{progress_bar}] {percent}%\r"
-
-    sys.stdout.write(text)
-    sys.stdout.flush()
-
-
-def on_complete_callback(data: Data) -> None:
-    output = f"{os.path.splitext(data.filepath)[0]}.mp3"
-
-    mp4 = pydub.AudioSegment.from_file(data.filepath, "mp4")
-    mp4.export(output, format="mp3")
-
-    audio = eyed3.load(output)
-    if audio and audio.tag:
-        audio.tag.title = data.title
-        audio.tag.artist = data.artist
-        audio.tag.album = data.album
-        audio.tag.release_year = data.release_year
-        audio.tag.tracks_num = data.tracks_num
-        audio.tag.images.set(3, data.image_data, "image/jpeg", u"cover")
-        audio.tag.save()
-        
-    os.remove(data.filepath)
-    print()
-
-
 def exit():
     sys.stdout.write('\033[?25h')
     sys.exit(0)
