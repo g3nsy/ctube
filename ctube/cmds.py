@@ -34,13 +34,19 @@ class Command:
 class Commands(Enum):
     SEARCH = Command(
         name="search", 
-        short_description="",
-        long_description="",
+        short_description="Searches for and provides music associated with the specified artist name.",
+        long_description=(
+            "Searches for and provides music associated with the specified artist name.\n"
+            "Some artists, although present, are not detected by the algorithm\n"
+            "that is responsible for providing the information. In this case\n"
+            "you need to consider using the 'id' command. For more information\n"
+            "about the 'id' command type 'info id'"
+        ),
         required_args=1,
         args={
             Argument(
                 name="<artist name>", 
-                description="", 
+                description="The name of the artist to search for", 
                 type=str
             )
         }
@@ -48,13 +54,21 @@ class Commands(Enum):
 
     ID = Command(
         name="id", 
-        short_description="",
-        long_description="",
+        short_description="Searches for and provides music associated with the specified ID.",
+        long_description=(
+            "Searches for and provides music associated with the specified ID.\n"
+            "This command is useful when the artist of interest is not found\n"
+            "by the 'search' command. The id can be extracted from the url of\n"
+            "the artist's page (music.youtube.com).\n"
+            "For example:\n"
+            "https://music.youtube.com/channel/UCrpJvPlZprRX930AKTID1KA\n" 
+            "                                  ^^^^^^^^^^^^^^^^^^^^^^^^"
+        ),
         required_args=1,
         args={
             Argument(
                 name="<artist id>", 
-                description="", 
+                description="the id of the artist to search for", 
                 type=str
             )
         }
@@ -62,13 +76,22 @@ class Commands(Enum):
 
     DOWNLOAD = Command(
         name="download", 
-        short_description="",
-        long_description="",
+        short_description="Starts downloading the specified media contents.",
+        long_description=(
+            "Starts downloading the specified media contents.\n"
+            "The contents are specified through the respective indexes.\n"
+            "If you intend to download only one content, simply provide\n"
+            "its index as an argument to the command.\n"
+            "Multiple contents can be specified as follows:\n"
+            "\u2022 Indices separated by a comma, for example 0, 1, ...\n"
+            "\u2022 A slice that respects the Python syntax, for example\n"
+            " 0:3 to download contents with index 0, 1, and 2."
+        ),
         required_args=1,
         args={
             Argument(
                 name="<indexes>", 
-                description="", 
+                description="The indexes of musical contents to download.", 
                 type=str
             )
         }
@@ -76,21 +99,24 @@ class Commands(Enum):
 
     EXIT = Command(
         name="exit", 
-        short_description="",
-        long_description="",
+        short_description="Exit the program.",
+        long_description="Exit the program.",
         required_args=0
     )
 
     HELP = Command(
         name="help", 
-        short_description="",
-        long_description="",
+        short_description="Print the help message.",
+        long_description=(
+            "Print the help message. If the flag -v (or --verbose) is specified\n"
+            "a long description of the commands is printed."
+        ),
         required_args=0,
         opts={
             Option(
                 short_name="-v", 
                 long_name="--verbose", 
-                description="",
+                description="Adds verbosity to the description of printed commands.",
                 required_args=0
             )
         }
@@ -98,18 +124,18 @@ class Commands(Enum):
 
     CLEAR = Command(
         name="clear", 
-        short_description="",
-        long_description="",
+        short_description="Clear the terminal screen.",
+        long_description="Clear the terminal screen.",
         required_args=0,
     )
 
     INFO = Command(
         name="info", 
-        short_description="",
-        long_description="",
+        short_description="Provides information about the specified command.",
+        long_description="Provides information about the specified command.",
         required_args=1,
         args={
-            Argument(name="<command name>", description="", type=str)
+            Argument(name="<command name>", description="The name of the command", type=str)
         },
         accepted_args={
             Argument(name="search", description="The 'search' command", type=str),
