@@ -1,19 +1,26 @@
-from ctube.cmds import Commands
-
-
 class CTubeError(Exception):
-    """Music Downloader Base Exception"""
+    """ctube base exception. All exceptions contained in 
+       this module inherit from this one."""
 
 
 class InvalidCommandArgument(CTubeError):
-    """ """
-    def __init__(self, cmd: Commands):
-        self.cmd = cmd
+    """It occurs when at least one argument passed as input 
+       to a command is considered invalid."""
 
 
-class InvalidSyntax(CTubeError):
-    """ """
+class CommandNotFoundError(CTubeError):
+    """It occurs when the user provides an unknown command."""
 
 
-class InvalidIndexSyntax(InvalidSyntax):
+class ArtistNotFoundError(CTubeError):
+    """This occurs when, during the process of extracting 
+       an artist's id, the id is not found."""
+
+
+class ContentNotFoundError(CTubeError):
+    """This occurs when, during the process of extracting 
+       an artist's content, the content is not found."""
+
+
+class InvalidIndexSyntax(CTubeError):
     """ """
