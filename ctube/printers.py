@@ -22,19 +22,24 @@ def print_info(cmd_name: str, verbose: bool = False) -> None:
             print(cmd_obj.value.long_description)
         else:
             print(cmd_obj.value.short_description)
+        print(color("Args:", Color.BLUE))
+        if cmd_obj.value.args:
+            for arg in cmd_obj.value.args:
+                print(color(f"{arg.name}:", Color.BOLD), arg.description)
     except KeyError:
         print(color(f"Invalid argument for command 'info': {cmd_name}", Color.RED))
         print(color(f"Valid arguments are {Commands.INFO.value.accepted_args}", Color.RED))
 
 
 def print_help(verbose: bool = False) -> None:
-    print(color("Commands overview", Color.GREEN))
+    print(color(":: Helper", Color.GREEN))
     for cmd in Commands:
-        print(f"\u2022 {color(cmd.value.name, Color.BOLD)}", end=" ")
+        print(f"\u2022 {color(cmd.value.name, Color.BOLD)}:")
         if verbose:
             print(color(cmd.value.long_description, Color.BLUE))
         else:
             print(color(cmd.value.short_description, Color.BLUE))
+        print()
 
 def print_centered(string: str) -> None:
     terminal_columns = shutil.get_terminal_size().columns
