@@ -5,7 +5,6 @@ from urllib import request
 from urllib.error import HTTPError
 from typing import Callable, List
 from ctube.containers import MusicItem, DownloadData
-from ctube.helpers import handle_connection_errors
 from pytubefix import Playlist, Stream, YouTube
 from pytubefix.exceptions import (
         MembersOnly, 
