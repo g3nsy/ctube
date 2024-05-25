@@ -1,4 +1,5 @@
 import sys
+import socket
 from typing import Optional
 from signal import signal, SIGINT
 from pytubefix import request
@@ -11,8 +12,8 @@ def signal_handler(_: Optional[int] = None):
     sys.exit(0)
 
 
+socket.setdefaulttimeout(3)
 signal(SIGINT, lambda signum, _: signal_handler(signum))
-
 request.default_range_size = request.default_range_size // 15
 
 
