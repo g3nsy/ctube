@@ -43,4 +43,4 @@ def clear_screen() -> None:
 
 
 def write(string: str, col: Color = Color.WHITE):
-    print(color(string, color=col))
+    print(color(string, col=col))
