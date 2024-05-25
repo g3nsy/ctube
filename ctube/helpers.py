@@ -1,4 +1,5 @@
 from typing import List , Callable
+from urllib.error import URLError
 from httpx import ReadTimeout, ConnectTimeout, ConnectError
 from innertube.errors import RequestError
 from ctube.containers import MusicItem
@@ -45,6 +46,6 @@ def handle_connection_errors(func: Callable) -> Callable:
             write("Invalid request", Color.RED)
         except (ConnectTimeout, ReadTimeout):
             write("An error occurred. try again.", Color.RED)
-        except ConnectError:
+        except (ConnectError, URLError):
             write("No internet connection", Color.RED)
     return inner

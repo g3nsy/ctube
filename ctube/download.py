@@ -5,6 +5,7 @@ from urllib import request
 from urllib.error import HTTPError
 from typing import Callable, List
 from ctube.containers import MusicItem, DownloadData
+from ctube.helpers import handle_connection_errors
 from pytubefix import Playlist, Stream, YouTube
 from pytubefix.exceptions import (
         MembersOnly, 
@@ -54,6 +55,7 @@ class Downloader:
         bytes_received = filesize - bytes_remaining
         self.on_progress_callback(data, filesize, bytes_received)
 
+    @handle_connection_errors
     def download(self, item: MusicItem, artist: str) -> List[YouTube]:
         playlist = Playlist(url=f"{BaseURL.PLAYLIST.value}{item.playlist_id}")
         failed_downloads: List[YouTube] = []
