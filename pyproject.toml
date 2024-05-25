@@ -16,6 +16,7 @@ eyed3 = "^0.9.7"
 innertube = "^2.1.16"
 pytubefix = "^5.4.2"
 pathvalidate = "^3.2.0"
+requests="^2.32.2"
 
 [tool.poetry.scripts]
 ctube = "ctube.cli:main"
