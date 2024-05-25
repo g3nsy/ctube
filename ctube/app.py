@@ -7,13 +7,11 @@ from ctube.terminal import Prompt
 from ctube.containers import MusicItem
 from ctube.colors import Color
 from ctube.cmds import Command
+from ctube.helpers import get_filtered_music_items
+from ctube.parser import parse_user_input
 from ctube.callbacks import (
     on_progress_callback, 
     on_complete_callback
-)
-from ctube.helpers import (
-    get_filtered_input,
-    get_filtered_music_items,
 )
 from ctube.printers import (
     print_header, 
@@ -54,7 +52,7 @@ class App:
             user_input = self.prompt.get_input()
             if not user_input: 
                 continue
-            cmd_name, args = get_filtered_input(user_input)
+            cmd_name, args = parse_user_input(user_input)
             if cmd_name not in [cmd.value.name for cmd in Command]:
                 write(f"Invalid command: {cmd_name}", Color.RED)
             elif cmd_name == Command.EXIT.value.name:
