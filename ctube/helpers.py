@@ -1,5 +1,4 @@
 from typing import Tuple, List, Optional, Union
-from ctube.decorators import handle_invalid_index_syntax
 from ctube.containers import MusicItem
 from ctube.errors import InvalidIndexSyntax
 
@@ -11,8 +10,7 @@ def get_filtered_input(user_input: str) -> Tuple[str, str]:
     return prefix, arg
 
 
-@handle_invalid_index_syntax
-def get_filtered_music_items(music_items: List[MusicItem], user_input: str) -> Optional[List[MusicItem]]:
+def get_filtered_music_items(music_items: List[MusicItem], user_input: str) -> List[MusicItem]:
     selected_indexes = get_selected_indexes(user_input)
     if not selected_indexes:
         return music_items
@@ -81,5 +79,3 @@ def get_selected_indexes(string: str) -> Optional[Union[slice, List[int]]]:
                     filtered_indexes.append(index)
             return filtered_indexes
         raise InvalidIndexSyntax(f"Invalid index syntax: {string}")
-
-
