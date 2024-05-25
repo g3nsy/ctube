@@ -13,13 +13,13 @@ def extract_artist_music(data: Dict) -> Tuple[List[MusicItem], str]:
     music_items: List[MusicItem] = []
     for item in data["contents"]["singleColumnBrowseResultsRenderer"]["tabs"][0][
         "tabRenderer"]["content"]["sectionListRenderer"]["contents"][
-        0]["gridRenderer"]["items"]:
+            0]["gridRenderer"]["items"]:
 
         item_data = item["musicTwoRowItemRenderer"]
         item_type = item_data["subtitle"]["runs"][0]["text"]
         title = item_data["title"]["runs"][0]["text"]
         release_year = int(item_data["subtitle"]["runs"][-1]["text"])
-        thumbanail_url = item_data["thumbnailRenderer"][
+        thumbnail_url = item_data["thumbnailRenderer"][
             "musicThumbnailRenderer"]["thumbnail"][
             "thumbnails"][-1]["url"]
         playlist_id = item_data["menu"]["menuRenderer"]["items"][
@@ -30,7 +30,7 @@ def extract_artist_music(data: Dict) -> Tuple[List[MusicItem], str]:
                 title=title, 
                 item_type=item_type,
                 release_year=release_year,
-                thumbanail_url=thumbanail_url,
+                thumbnail_url=thumbnail_url,
                 playlist_id=playlist_id
             )
         )
