@@ -1,92 +1,71 @@
 from enum import Enum
 from dataclasses import dataclass
-from typing import List, Set, Optional
-from ctube.colors import get_color_names
 
 
-@dataclass
-class Command:
+@dataclass(unsafe_hash=True)
+class _Command:
     name: str
     description: str
-    expected_args: str
-    expected_num_args: int
-    accepted_args: Optional[Set[str]] = None
 
 
-class Commands(Enum):
-    SEARCH = Command(
+class Command(Enum):
+    SEARCH = _Command(
         name="search", 
-        description="Search by artist name",
-        expected_args="<artist name>",
-        expected_num_args=1
+        description=(
+            "Searches for and provides music associated with the specified artist name.\n"
+            "Some artists, although present, are not detected by the algorithm\n"
+            "that is responsible for providing the information. In this case\n"
+            "you need to consider using the 'id' command. For more information\n"
+            "about the 'id' command type 'info id'"
+        )
     )
-    ID = Command(
+
+    ID = _Command(
         name="id", 
-        description="Search by artist ID",
-        expected_args="<artist id>",
-        expected_num_args=1
+        description=(
+            "Searches for and provides music associated with the specified ID.\n"
+            "This command is useful when the artist of interest is not found\n"
+            "by the 'search' command. The id can be extracted from the url of\n"
+            "the artist's page (music.youtube.com).\n"
+            "For example:\n"
+            "https://music.youtube.com/channel/UCrpJvPlZprRX930AKTID1KA\n" 
+            "                                  ^^^^^^^^^^^^^^^^^^^^^^^^"
+        )
     )
-    DOWNLOAD = Command(
+
+    DOWNLOAD = _Command(
         name="download", 
-        description="Downloads",
-        expected_args="Indexes",
-        expected_num_args=-1
+        description=(
+            "Starts downloading the specified media contents.\n"
+            "The contents are specified through the respective indexes.\n"
+            "If you intend to download only one content, simply provide\n"
+            "its index as an argument to the command.\n"
+            "Multiple contents can be specified as follows:\n"
+            "\u2022 'all': download all contents.\n"
+            "\u2022 Indices separated by a comma, for example 0, 1, ...\n"
+            "\u2022 A slice that respects the Python syntax, for example\n"
+            " 0:3 to download contents with index 0, 1, and 2."
+        )
     )
-    EXIT = Command(
+
+    EXIT = _Command(
         name="exit", 
-        description="Exit the program",
-        expected_args="",
-        expected_num_args=0
+        description="Exit the program."
     )
-    HELP = Command(
+
+    HELP = _Command(
         name="help", 
-        description="Print the help message",
-        expected_args="",
-        expected_num_args=0
+        description=(
+            "Print the help message. If the flag -v (or --verbose) is specified\n"
+            "a long description of the commands is printed."
+        )
     )
-    CLEAR = Command(
+
+    CLEAR = _Command(
         name="clear", 
-        description="Clear the console",
-        expected_args="",
-        expected_num_args=0
-    )
-    INFO = Command(
-        name="info", 
-        description="Print the info of a specific command",
-        expected_args="<command name>",
-        expected_num_args=1,
-        accepted_args={"search", "id", "exit", "help", "clear", "info"}
-    )
-    PROMPT_CHAR = Command(
-        name="prompt-char",
-        description="Change the prompt char",
-        expected_args="<char>",
-        expected_num_args=1,
-    )
-    PROMPT_COLOR = Command(
-        name="prompt-color",
-        description="Change the prompt color",
-        expected_args="<color>",
-        expected_num_args=1,
-        accepted_args=get_color_names()
+        description="Clear the terminal screen."
     )
 
-
-def get_cmd_with_args() -> List[Commands]:
-    return [
-        cmd for cmd in Commands 
-        if cmd.value.expected_num_args > 0 
-        or cmd.value.expected_num_args == -1
-    ]
-
-
-def get_available_cmds_names() -> List[str]:
-    return [cmd.value.name for cmd in Commands]
-
-
-def get_cmd_by_name(cmd_name: str) -> Commands:
-    return Commands.__members__[cmd_name.replace("-", "_").upper()]
-
-
-def is_command(cmd_name: str, cmd: Commands) -> bool:
-    return cmd_name == cmd.value.name
+    @classmethod
+    def get_by_name(cls, name: str) -> "Command":
+        return cls.__members__[name.replace("-", "_").upper()]

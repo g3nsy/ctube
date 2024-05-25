@@ -1,19 +1,7 @@
-from ctube.cmds import Commands
-
-
 class CTubeError(Exception):
-    """Music Downloader Base Exception"""
+    """ctube base exception. All exceptions contained in 
+       this module inherit from this one."""
 
 
-class InvalidCommandArgument(CTubeError):
-    """ """
-    def __init__(self, cmd: Commands):
-        self.cmd = cmd
-
-
-class InvalidSyntax(CTubeError):
-    """ """
-
-
-class InvalidIndexSyntax(InvalidSyntax):
+class InvalidIndexSyntax(CTubeError):
     """ """

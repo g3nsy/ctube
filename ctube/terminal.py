@@ -1,16 +1,18 @@
-import sys, tty, termios
+import sys
+import tty
+import termios
 from typing import List, Optional
 from ctube.colors import Color, color
 
 
 class Prompt:
-    def __init__(self, char: str = "❯", color: Color = Color.GREEN):
+    def __init__(self, char: str = "❯", col: Color = Color.GREEN):
 
         self.char = char
-        self.color = color
+        self.col = col
 
     def get_input(self):
-        return input(f"{color(self.char, self.color)} ")
+        return input(f"{color(self.char, self.col)} ")
 
 
 class Buffer:

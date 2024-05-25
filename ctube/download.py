@@ -3,8 +3,7 @@ from pathvalidate import sanitize_filename
 from enum import Enum
 from urllib import request
 from typing import Callable, List
-from dataclasses import dataclass
-from ctube.containers import MusicItem
+from ctube.containers import MusicItem, DownloadData
 from pytubefix import Playlist, Stream, YouTube
 from pytubefix.exceptions import (
         MembersOnly, 
@@ -18,23 +17,12 @@ class BaseURL(str, Enum):
     PLAYLIST = "https://music.youtube.com/playlist?list="
 
 
-@dataclass(kw_only=True)
-class Data:
-    title: str
-    album: str
-    artist: str
-    release_year: int
-    tracks_num: int
-    image_data: bytes
-    filepath: str
-
-
 class Downloader:
     def __init__(
             self,
             output_path: str,
-            on_complete_callback: Callable[[Data], None],
-            on_progress_callback: Callable[[Data, int, int], None],
+            on_complete_callback: Callable[[DownloadData], None],
+            on_progress_callback: Callable[[DownloadData, int, int], None],
             skip_existing: bool = False
     ):
         self.output_path = output_path
@@ -56,11 +44,11 @@ class Downloader:
             raise NotADirectoryError
         self._output_path = output_path
 
-    def _on_complete_callback(self, data: Data, filepath: str) -> None:
+    def _on_complete_callback(self, data: DownloadData, filepath: str) -> None:
         data.filepath = filepath
         self.on_complete_callback(data)
 
-    def _on_progress_callback(self, data: Data, bytes_remaining: int, stream: Stream) -> None:
+    def _on_progress_callback(self, data: DownloadData, bytes_remaining: int, stream: Stream) -> None:
         filesize = stream.filesize
         bytes_received = filesize - bytes_remaining
         self.on_progress_callback(data, filesize, bytes_received)
@@ -69,7 +57,7 @@ class Downloader:
         playlist = Playlist(url=f"{BaseURL.PLAYLIST.value}{item.playlist_id}")
         failed_downloads: List[YouTube] = []
 
-        response = request.urlopen(item.thumbanail_url)
+        response = request.urlopen(item.thumbnail_url)
         image_data = response.read()
 
         final_destination = os.path.join(
@@ -102,7 +90,7 @@ class Downloader:
                 failed_downloads.append(youtube)
                 continue
 
-            data = Data(
+            data = DownloadData(
                 title=youtube.title,
                 artist=artist,
                 album=item.title,
