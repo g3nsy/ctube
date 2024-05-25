@@ -1,7 +1,11 @@
-from typing import List 
+from typing import List , Callable
+from httpx import ReadTimeout, ConnectTimeout, ConnectError
+from innertube.errors import RequestError
 from ctube.containers import MusicItem
 from ctube.errors import InvalidIndexSyntax
 from ctube.parser import parse_indexes
+from ctube.colors import Color
+from ctube.printers import write
 
 
 def get_filtered_music_items(music_items: List[MusicItem], user_input: str) -> List[MusicItem]:
@@ -31,3 +35,16 @@ def get_filtered_music_items(music_items: List[MusicItem], user_input: str) -> L
                 raise InvalidIndexSyntax(f"Invalid index: {str_incorrect_indexes}")
         else:
             return [music_items[index] for index in selected_indexes]
+
+
+def handle_connection_errors(func: Callable) -> Callable:
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except RequestError:
+            write("Invalid request", Color.RED)
+        except (ConnectTimeout, ReadTimeout):
+            write("An error occurred. try again.", Color.RED)
+        except ConnectError:
+            write("No internet connection", Color.RED)
+    return inner
