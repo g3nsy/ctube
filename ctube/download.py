@@ -2,6 +2,7 @@ import os
 from pathvalidate import sanitize_filename
 from enum import Enum
 from urllib import request
+from urllib.error import HTTPError
 from typing import Callable, List
 from ctube.containers import MusicItem, DownloadData
 from pytubefix import Playlist, Stream, YouTube
@@ -114,9 +115,12 @@ class Downloader:
                 )
             )
 
-            audio_stream.download(
-                output_path=final_destination,
-                skip_existing=self.skip_existing
-            )
+            try:
+                audio_stream.download(
+                    output_path=final_destination,
+                    skip_existing=self.skip_existing
+                )
+            except HTTPError:
+                failed_downloads.append(youtube)
 
         return failed_downloads
