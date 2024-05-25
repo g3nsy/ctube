@@ -1,17 +1,15 @@
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, List, Tuple
 from ctube.containers import MusicItem
-from ctube.decorators import handle_extraction
 
-@handle_extraction
-def extract_artist_id(data: Dict) -> Optional[str]:
+
+def extract_artist_id(data: Dict) -> str:
     return data["contents"]["tabbedSearchResultsRenderer"][
         "tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"][
         "contents"][1]["musicCardShelfRenderer"]["title"]["runs"][0][
         "navigationEndpoint"]["browseEndpoint"]["browseId"]
 
 
-@handle_extraction
-def extract_artist_music(data: Dict) -> Optional[Tuple[List[MusicItem], str]]:
+def extract_artist_music(data: Dict) -> Tuple[List[MusicItem], str]:
     music_items: List[MusicItem] = []
     for item in data["contents"]["singleColumnBrowseResultsRenderer"]["tabs"][0][
         "tabRenderer"]["content"]["sectionListRenderer"]["contents"][
@@ -40,8 +38,7 @@ def extract_artist_music(data: Dict) -> Optional[Tuple[List[MusicItem], str]]:
         "musicHeaderRenderer"]["title"]["runs"][0]["text"]
 
 
-@handle_extraction
-def extract_search_suggestions(data: Dict) -> Optional[List[str]]:
+def extract_search_suggestions(data: Dict) -> List[str]:
     search_suggestions_section: Dict = data["contents"][0][
         "searchSuggestionsSectionRenderer"]
     if "contents" in search_suggestions_section:
