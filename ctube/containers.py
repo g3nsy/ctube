@@ -6,7 +6,7 @@ class MusicItem:
     title: str
     item_type: str
     release_year: int
-    thumbanail_url: str
+    thumbnail_url: str
     playlist_id: str
 
 

@@ -49,4 +49,3 @@ def parse_indexes(string: str) -> Optional[Union[slice, List[int]]]:
                     filtered_indexes.append(index)
             return filtered_indexes
         raise InvalidIndexSyntax(f"Invalid index syntax: {string}")
-
