@@ -1,3 +1,4 @@
+import requests
 from typing import List , Callable
 from urllib.error import URLError
 from httpx import ReadTimeout, ConnectTimeout, ConnectError
@@ -49,3 +50,11 @@ def handle_connection_errors(func: Callable) -> Callable:
         except (ConnectError, URLError):
             write("No internet connection", Color.RED)
     return inner
+
+
+def connected_to_internet(url: str = 'http://www.google.com/', timeout: int = 5) -> bool:
+    try:
+        _ = requests.head(url, timeout=timeout)
+        return True
+    except requests.ConnectionError:
+        return False
