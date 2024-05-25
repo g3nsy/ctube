@@ -1,4 +1,6 @@
 # ctube
+![Version](https://img.shields.io/badge/version-0.0.4-blue)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://en.wikipedia.org/wiki/MIT_License)
 
 ---
 ctube is a simple program for downloading music. Written in Python, ctube has a command line interface.\
