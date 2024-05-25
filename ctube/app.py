@@ -1,5 +1,6 @@
 import sys
 from typing import List, Optional, Tuple
+from urllib.error import URLError
 from innertube.clients import InnerTube
 from ctube.download import Downloader
 from ctube.errors import InvalidIndexSyntax
@@ -7,7 +8,11 @@ from ctube.terminal import Prompt
 from ctube.containers import MusicItem
 from ctube.colors import Color
 from ctube.cmds import Command
-from ctube.helpers import get_filtered_music_items, handle_connection_errors
+from ctube.helpers import (
+    get_filtered_music_items, 
+    handle_connection_errors,
+    connected_to_internet
+)
 from ctube.parser import parse_user_input
 from ctube.callbacks import (
     on_progress_callback, 
@@ -101,9 +106,12 @@ class App:
 
     def _download(self, indexes: str):
         if not self._music_items or not self._artist_name:
-            write("You need to search for music first. Use the search or id command", Color.RED)
+            write("You need to search for music first. ", Color.RED)
+            write("Use the search/id command", Color.RED)
         elif not indexes:
             write("Missing argument: indexes", Color.RED)
+        elif not connected_to_internet():
+            write("No internet connection", Color.RED)
         else:
             try:
                 filtered_items = get_filtered_music_items(self._music_items, indexes)
@@ -117,10 +125,16 @@ class App:
                     write(f"Selected items:", Color.BLUE)
                 for item in filtered_items:
                     write(f"\u2022 {item.title}", Color.BOLD)
+
                 for item in filtered_items:
                     write(f":: Downloading: {item.title}", Color.GREEN)
-                    self.downloader.download(item=item, artist=self._artist_name)
-                    print('\033[?25h', end="")
+                    try:
+                        self.downloader.download(item=item, artist=self._artist_name)
+                    except (URLError, TimeoutError) as error:
+                        write(f"A connection error occurred while downloading: {item.title}", Color.RED)
+                        write(f"Reason: {str(error)}", Color.RED)
+                        break
+                print('\033[?25h', end="")
 
     @staticmethod
     def _exit():
