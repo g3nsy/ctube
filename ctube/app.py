@@ -7,7 +7,7 @@ from ctube.terminal import Prompt
 from ctube.containers import MusicItem
 from ctube.colors import Color
 from ctube.cmds import Command
-from ctube.helpers import get_filtered_music_items
+from ctube.helpers import get_filtered_music_items, handle_connection_errors
 from ctube.parser import parse_user_input
 from ctube.callbacks import (
     on_progress_callback, 
@@ -70,6 +70,7 @@ class App:
             else:
                 write("Invalid syntax", Color.RED)
 
+    @handle_connection_errors
     def _search(self, artist_name: str) -> None:
         if not artist_name:
             write("Missing argument: artist name", Color.RED)
@@ -82,6 +83,7 @@ class App:
             else:
                 self._id(artist_id)
 
+    @handle_connection_errors
     def _id(self, artist_id: str) -> None:
         if not artist_id:
             write("Missing argument: artist id", Color.RED)
