@@ -14,5 +14,5 @@ pip install ctube
 
 ---
 <p align="center">
-    <img src=".github/ctube.gif" alt="ctube.gfi">
+    <img src=".github/ctube.gif" alt="ctube.gif">
 </p>
