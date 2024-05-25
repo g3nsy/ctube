@@ -57,7 +57,7 @@ class Downloader:
         playlist = Playlist(url=f"{BaseURL.PLAYLIST.value}{item.playlist_id}")
         failed_downloads: List[YouTube] = []
 
-        response = request.urlopen(item.thumbanail_url)
+        response = request.urlopen(item.thumbnail_url)
         image_data = response.read()
 
         final_destination = os.path.join(
