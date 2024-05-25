@@ -41,6 +41,7 @@ class Command(Enum):
             "If you intend to download only one content, simply provide\n"
             "its index as an argument to the command.\n"
             "Multiple contents can be specified as follows:\n"
+            "\u2022 'all': download all contents.\n"
             "\u2022 Indices separated by a comma, for example 0, 1, ...\n"
             "\u2022 A slice that respects the Python syntax, for example\n"
             " 0:3 to download contents with index 0, 1, and 2."
