@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ctube"
-version = "0.0.3"
+version = "0.0.4"
 description = ""
 authors = ["Simone Gentili <gensydev@gmail.com>"]
 license = "MIT"
