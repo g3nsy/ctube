@@ -13,10 +13,7 @@ pip install ctube
 ```
 
 ### usage
-just type ctube and press enter.
-```
-ctube
-```
+to run ctube just type ctube in the terminal and press enter.
 
 ---
 <p align="center">
@@ -25,4 +22,12 @@ ctube
 
 ---
 
+The program is in a stable state, however some features are missing such as:
+- better artist search.
+- configuration via file.
+- better display of download status.
+- possibility to choose the metadata to embed.
+- possibility to choose the file format and other audio parameters.
+
+---
 Currently tested on Arch Linux.
