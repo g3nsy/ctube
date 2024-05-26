@@ -15,8 +15,7 @@ class Command(Enum):
             "Searches for and provides music associated with the specified artist name.\n"
             "Some artists, although present, are not detected by the algorithm\n"
             "that is responsible for providing the information. In this case\n"
-            "you need to consider using the 'id' command. For more information\n"
-            "about the 'id' command type 'info id'"
+            "you need to consider using the 'id' command."
         )
     )
 
@@ -55,10 +54,7 @@ class Command(Enum):
 
     HELP = _Command(
         name="help", 
-        description=(
-            "Print the help message. If the flag -v (or --verbose) is specified\n"
-            "a long description of the commands is printed."
-        )
+        description="Print the help message."
     )
 
     CLEAR = _Command(
