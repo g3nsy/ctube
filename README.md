@@ -12,7 +12,17 @@ Type help for more information about the available commands and how they work.
 pip install ctube
 ```
 
+### usage
+just type ctube and press enter.
+```
+ctube
+```
+
 ---
 <p align="center">
     <img src=".github/ctube.gif" alt="ctube.gif">
 </p>
+
+---
+
+Currently tested on Arch Linux.
