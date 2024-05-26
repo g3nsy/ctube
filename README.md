@@ -30,4 +30,6 @@ The program is in a stable state, however some features are missing such as:
 - possibility to choose the file format and other audio parameters.
 
 ---
-Currently tested on Arch Linux.
+Tested on Arch Linux:
+- alacritty 0.13.2
+- python 3.12.3
