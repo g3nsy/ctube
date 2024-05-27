@@ -1,5 +1,5 @@
 # ctube
-![Version](https://img.shields.io/badge/version-0.0.9-blue)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://en.wikipedia.org/wiki/MIT_License)
 
 ---
