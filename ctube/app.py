@@ -54,7 +54,8 @@ class App:
         clear_screen()
         print_header()
         while True:
-            user_input = self.prompt.get_input()
+            user_input = self.prompt.get_input().strip()
+
             if not user_input: 
                 continue
 
