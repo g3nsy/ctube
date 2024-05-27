@@ -12,7 +12,24 @@ Type help for more information about the available commands and how they work.
 pip install ctube
 ```
 
+### usage
+to run ctube just type ctube in the terminal and press enter.
+
 ---
 <p align="center">
     <img src=".github/ctube.gif" alt="ctube.gif">
 </p>
+
+---
+
+The program is in a stable state, however some features are missing such as:
+- better artist search.
+- configuration via file.
+- better display of download status.
+- possibility to choose the metadata to embed.
+- possibility to choose the file format and other audio parameters.
+
+---
+Tested on Arch Linux:
+- alacritty 0.13.2
+- python 3.12.3
