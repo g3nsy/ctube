@@ -57,23 +57,27 @@ class App:
             user_input = self.prompt.get_input()
             if not user_input: 
                 continue
+
             cmd_name, args = parse_user_input(user_input)
-            if cmd_name not in [cmd.value.name for cmd in Command]:
+
+            try:
+                cmd = Command.get_by_name(cmd_name)
+            except KeyError:
                 write(f"Invalid command: {cmd_name}", Color.RED)
-            elif cmd_name == Command.EXIT.value.name:
-                App._exit()
-            elif cmd_name == Command.CLEAR.value.name:
-                clear_screen()
-            elif cmd_name == Command.HELP.value.name:
-                print_help()
-            elif cmd_name == Command.SEARCH.value.name:
-                self._search(args)
-            elif cmd_name == Command.ID.value.name:
-                self._id(args)
-            elif cmd_name == Command.DOWNLOAD.value.name:
-                self._download(args)
             else:
-                write("Invalid syntax", Color.RED)
+                match cmd:
+                    case Command.EXIT:
+                        App._exit()
+                    case Command.CLEAR:
+                        clear_screen()
+                    case Command.HELP:
+                        print_help()
+                    case Command.SEARCH:
+                        self._search(args)
+                    case Command.ID:
+                        self._id(args)
+                    case Command.DOWNLOAD:
+                        self._download(args)
 
     @handle_connection_errors
     def _search(self, artist_name: str) -> None:
@@ -106,7 +110,7 @@ class App:
 
     def _download(self, indexes: str):
         if not self._music_items or not self._artist_name:
-            write("You need to search for music first. ", Color.RED)
+            write("You need to search for music first.", Color.RED)
             write("Use the search/id command", Color.RED)
         elif not indexes:
             write("Missing argument: indexes", Color.RED)
