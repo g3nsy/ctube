@@ -24,12 +24,16 @@ class Downloader:
             output_path: str,
             on_complete_callback: Callable[[Song], None],
             on_progress_callback: Callable[[Song, int, int], None],
-            skip_existing: bool = False
+            skip_existing: bool = False,
+            timeout: int = 3,
+            max_retries: int = 0
     ):
         self.output_path = output_path
         self.on_complete_callback = on_complete_callback 
         self.on_progress_callback = on_progress_callback
         self.skip_existing = skip_existing
+        self.timeout = timeout
+        self.max_retries = max_retries
 
     @property
     def output_path(self) -> str:
@@ -117,7 +121,9 @@ class Downloader:
             try:
                 audio_stream.download(
                     output_path=final_destination,
-                    skip_existing=self.skip_existing
+                    skip_existing=self.skip_existing,
+                    timeout=self.timeout,
+                    max_retries=self.max_retries
                 )
             except HTTPError:
                 failed_downloads.append(youtube)
