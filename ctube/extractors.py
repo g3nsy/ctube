@@ -1,5 +1,5 @@
 from typing import Dict, List, Tuple
-from ctube.containers import MusicItem
+from ctube.containers import Album
 
 
 def extract_artist_id(data: Dict) -> str:
@@ -9,14 +9,14 @@ def extract_artist_id(data: Dict) -> str:
         "navigationEndpoint"]["browseEndpoint"]["browseId"]
 
 
-def extract_artist_music(data: Dict) -> Tuple[List[MusicItem], str]:
-    music_items: List[MusicItem] = []
+def extract_albums(data: Dict) -> Tuple[List[Album], str]:
+    albums: List[Album] = []
     for item in data["contents"]["singleColumnBrowseResultsRenderer"]["tabs"][0][
         "tabRenderer"]["content"]["sectionListRenderer"]["contents"][
             0]["gridRenderer"]["items"]:
 
         item_data = item["musicTwoRowItemRenderer"]
-        item_type = item_data["subtitle"]["runs"][0]["text"]
+        album_type = item_data["subtitle"]["runs"][0]["text"]
         title = item_data["title"]["runs"][0]["text"]
         release_year = int(item_data["subtitle"]["runs"][-1]["text"])
         thumbnail_url = item_data["thumbnailRenderer"][
@@ -25,16 +25,16 @@ def extract_artist_music(data: Dict) -> Tuple[List[MusicItem], str]:
         playlist_id = item_data["menu"]["menuRenderer"]["items"][
             0]["menuNavigationItemRenderer"]["navigationEndpoint"][
             "watchPlaylistEndpoint"]["playlistId"]
-        music_items.append(
-            MusicItem(
+        albums.append(
+            Album(
                 title=title, 
-                item_type=item_type,
+                album_type=album_type,
                 release_year=release_year,
                 thumbnail_url=thumbnail_url,
                 playlist_id=playlist_id
             )
         )
-    return music_items, data["header"][
+    return albums, data["header"][
         "musicHeaderRenderer"]["title"]["runs"][0]["text"]
 
 

@@ -5,11 +5,11 @@ from innertube.clients import InnerTube
 from ctube.download import Downloader
 from ctube.errors import InvalidIndexSyntax
 from ctube.terminal import Prompt
-from ctube.containers import MusicItem
+from ctube.containers import Album
 from ctube.colors import Color
 from ctube.cmds import Command
 from ctube.helpers import (
-    get_filtered_music_items, 
+    filter_albums, 
     handle_connection_errors,
     connected_to_internet
 )
@@ -19,15 +19,15 @@ from ctube.callbacks import (
     on_complete_callback
 )
 from ctube.printers import (
+    clear_screen,
+    print_albums,
     print_header, 
     print_help, 
-    print_music_items,
-    write,
-    clear_screen
+    write
 )
 from ctube.extractors import (
     extract_artist_id, 
-    extract_artist_music
+    extract_albums
 )
 
 
@@ -47,7 +47,7 @@ class App:
         )
 
         # last search
-        self._music_items: Optional[List[MusicItem]] = None
+        self._albums: Optional[List[Album]] = None
         self._artist_name: Optional[str] = None
 
     def main_loop(self) -> None:
@@ -100,17 +100,17 @@ class App:
         else:
             data = self.client.browse(f"MPAD{artist_id}")
             try:
-                artist_music_data = extract_artist_music(data)
+                artist_music_data = extract_albums(data)
             except (KeyError, TypeError, IndexError):
                 write(f"Content not found", Color.RED)
             else:
-                artist_music_data: Tuple[List[MusicItem], str]
-                self._music_items, self._artist_name = artist_music_data
+                artist_music_data: Tuple[List[Album], str]
+                self._albums, self._artist_name = artist_music_data
                 write(f"Collected music for {self._artist_name}", Color.GREEN)
-                print_music_items(self._music_items)
+                print_albums(self._albums)
 
     def _download(self, indexes: str):
-        if not self._music_items or not self._artist_name:
+        if not self._albums or not self._artist_name:
             write("You need to search for music first.", Color.RED)
             write("Use the search/id command", Color.RED)
         elif not indexes:
@@ -119,24 +119,25 @@ class App:
             write("No internet connection", Color.RED)
         else:
             try:
-                filtered_items = get_filtered_music_items(self._music_items, indexes)
+                albums = filter_albums(self._albums, indexes)
             except InvalidIndexSyntax as error:
                 write(str(error), Color.RED)
             else:
                 print('\033[?25l', end="")
-                if len(filtered_items) == len(self._music_items):
+                if len(albums) == len(self._albums):
                     write(f"Selected items: ALL", Color.BLUE)
                 else:
                     write(f"Selected items:", Color.BLUE)
-                for item in filtered_items:
-                    write(f"\u2022 {item.title}", Color.BOLD)
 
-                for item in filtered_items:
-                    write(f":: Downloading: {item.title}", Color.GREEN)
+                for album in albums:
+                    write(f"\u2022 {album.title}", Color.BOLD)
+
+                for album in albums:
+                    write(f":: Downloading: {album.title}", Color.GREEN)
                     try:
-                        self.downloader.download(item=item, artist=self._artist_name)
+                        self.downloader.download(album=album, artist=self._artist_name)
                     except (URLError, TimeoutError) as error:
-                        write(f"A connection error occurred while downloading: {item.title}", Color.RED)
+                        write(f"A connection error occurred while downloading: {album.title}", Color.RED)
                         write(f"Reason: {str(error)}", Color.RED)
                         break
                 print('\033[?25h', end="")

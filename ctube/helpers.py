@@ -3,31 +3,31 @@ from typing import List , Callable
 from urllib.error import URLError
 from httpx import ReadTimeout, ConnectTimeout, ConnectError
 from innertube.errors import RequestError
-from ctube.containers import MusicItem
+from ctube.containers import Album
 from ctube.errors import InvalidIndexSyntax
 from ctube.parser import parse_indexes
 from ctube.colors import Color
 from ctube.printers import write
 
 
-def get_filtered_music_items(music_items: List[MusicItem], user_input: str) -> List[MusicItem]:
+def filter_albums(albums: List[Album], user_input: str) -> List[Album]:
     selected_indexes = parse_indexes(user_input)
     if not selected_indexes:
-        return music_items
+        return albums
 
     elif isinstance(selected_indexes, slice):
-        selected_music_items = music_items[selected_indexes]
-        if not selected_music_items:
+        selected_albums = albums[selected_indexes]
+        if not selected_albums:
             if selected_indexes.start == selected_indexes.stop - 1:
                 raise InvalidIndexSyntax(f"Invalid index: {selected_indexes.start}")
             else:
                 raise InvalidIndexSyntax(f"Invalid slice: {selected_indexes.start}:{selected_indexes.stop}")
         else:
-            return selected_music_items
+            return selected_albums
     else:
         incorrect_indexes: List[int] = []
         for index in selected_indexes:
-            if index >= len(music_items):
+            if index >= len(albums):
                 incorrect_indexes.append(index)
         if incorrect_indexes:
             str_incorrect_indexes = ', '.join(map(str, incorrect_indexes))
@@ -36,7 +36,7 @@ def get_filtered_music_items(music_items: List[MusicItem], user_input: str) -> L
             else:
                 raise InvalidIndexSyntax(f"Invalid index: {str_incorrect_indexes}")
         else:
-            return [music_items[index] for index in selected_indexes]
+            return [albums[index] for index in selected_indexes]
 
 
 def handle_connection_errors(func: Callable) -> Callable:

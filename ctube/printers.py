@@ -3,7 +3,7 @@ from typing import List
 import ctube
 from ctube.cmds import Command
 from ctube.colors import color, Color
-from ctube.containers import MusicItem
+from ctube.containers import Album
 
 
 def print_header() -> None:
@@ -23,15 +23,15 @@ def print_help() -> None:
         print()
 
 
-def print_music_items(music_items: List[MusicItem]) -> None:
+def print_albums(albums: List[Album]) -> None:
     terminal_columns = shutil.get_terminal_size().columns
-    max_index_len = len(str(len(music_items)))
+    max_index_len = len(str(len(albums)))
     space_for_title = terminal_columns - max_index_len - 3  # [, ], ' '
-    for i, music_item in enumerate(music_items):
-        if len(music_item.title) > space_for_title:
-            title = f"{music_item.title[:space_for_title - 3]}..."
+    for i, album in enumerate(albums):
+        if len(album.title) > space_for_title:
+            title = f"{album.title[:space_for_title - 3]}..."
         else:
-            title = music_item.title
+            title = album.title
         lb = color("[", Color.BLUE)
         rb = color("]", Color.BLUE)
         ci = color(str(i), Color.GREEN)
