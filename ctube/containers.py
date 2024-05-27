@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 
-@dataclass(kw_only=True)
+@dataclass
 class MusicItem:
     title: str
     item_type: str
@@ -10,7 +10,7 @@ class MusicItem:
     playlist_id: str
 
 
-@dataclass(kw_only=True)
+@dataclass
 class DownloadData:
     title: str
     album: str
