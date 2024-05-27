@@ -1,4 +1,5 @@
 import os
+from http.client import IncompleteRead
 from pathvalidate import sanitize_filename
 from enum import Enum
 from urllib import request
@@ -125,7 +126,7 @@ class Downloader:
                     timeout=self.timeout,
                     max_retries=self.max_retries
                 )
-            except HTTPError:
+            except (HTTPError, IncompleteRead):
                 failed_downloads.append(youtube)
 
         return failed_downloads
