@@ -3,11 +3,11 @@ import sys
 import shutil
 import eyed3
 from pydub import AudioSegment
-from ctube.containers import DownloadData
+from ctube.containers import Song
 
 
 def on_progress_callback(
-        download_data: DownloadData,
+        song: Song,
         filesize: int, 
         bytes_received: int, 
 ) -> None:
@@ -19,7 +19,7 @@ def on_progress_callback(
     percent = round(100.0 * bytes_received / float(filesize), 1)
 
     distance_from_bar = columns - (max_width + 9)  # len bar + percentage len
-    title = f":: {download_data.title} "
+    title = f":: {song.title} "
 
     if len(title) > distance_from_bar:
         title = f"{title[:distance_from_bar - 4]}... "
@@ -32,18 +32,35 @@ def on_progress_callback(
     sys.stdout.flush()
 
 
-def on_complete_callback(download_data: DownloadData) -> None:
-    output = f"{os.path.splitext(download_data.filepath)[0]}.mp3"
-    mp4 = AudioSegment.from_file(download_data.filepath, "mp4")
+def on_complete_callback(song: Song) -> None:
+    output = f"{os.path.splitext(song.filepath)[0]}.mp3"
+    mp4 = AudioSegment.from_file(song.filepath, "mp4")
     mp4.export(output, format="mp3")
-    audio = eyed3.load(output)
-    if audio and audio.tag:
-        audio.tag.title = download_data.title
-        audio.tag.artist = download_data.artist
-        audio.tag.album = download_data.album
-        audio.tag.release_year = download_data.release_year
-        audio.tag.tracks_num = download_data.tracks_num
-        audio.tag.images.set(3, download_data.image_data, "image/jpeg", u"cover")
-        audio.tag.save()
-    os.remove(download_data.filepath)
+    set_metadata(filepath=output, song=song)
+    os.remove(song.filepath)
     print()
+
+
+def set_metadata(filepath: str, song: Song) -> None:
+    audio = eyed3.load(filepath)
+    album = song.album
+    if audio and audio.tag:
+        tag = audio.tag
+        # Song tag
+        tag.title = song.title
+        tag.artist = song.artist
+        tag.track_num = song.track_num
+        tag.images.set(3, song.image_data, "image/jpeg", u"cover")
+
+        # Album tag
+        # eyed3.tag supported album_type values:
+        # lp, ep, compilation, live, various, demo, sigle
+        album_type = album.album_type.lower()
+        if album_type != "album":
+            try:
+                tag.album_type = album_type 
+            except ValueError:
+                pass  # TODO: log error
+        tag.album = album.title
+        tag.release_year = album.release_year
+        tag.save()
