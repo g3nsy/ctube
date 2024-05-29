@@ -1,18 +1,13 @@
 import os
-from http.client import IncompleteRead
-from pathvalidate import sanitize_filename
-from enum import Enum
-from urllib import request
 from urllib.error import HTTPError
-from typing import Callable, List
+from pathvalidate import sanitize_filename
+from http.client import IncompleteRead
+from enum import Enum
+from typing import Callable, Generator
 from ctube.containers import Album, Song
 from pytubefix import Playlist, Stream, YouTube
-from pytubefix.exceptions import (
-        MembersOnly, 
-        RecordingUnavailable, 
-        VideoPrivate, 
-        VideoUnavailable
-)
+from pytubefix.exceptions import VideoUnavailable
+from ctube.errors import NoMP4StreamAvailable, EmptyStreamQuery
 
 
 class BaseURL(str, Enum):
@@ -26,8 +21,8 @@ class Downloader:
             on_complete_callback: Callable[[Song], None],
             on_progress_callback: Callable[[Song, int, int], None],
             skip_existing: bool = False,
-            timeout: int = 3,
-            max_retries: int = 0
+            timeout: int = 5,
+            max_retries: int = 2
     ):
         self.output_path = output_path
         self.on_complete_callback = on_complete_callback 
@@ -59,42 +54,23 @@ class Downloader:
         bytes_received = filesize - bytes_remaining
         self.on_progress_callback(data, filesize, bytes_received)
 
-    def download(self, album: Album, artist: str) -> List[YouTube]:
-        playlist = Playlist(url=f"{BaseURL.PLAYLIST.value}{album.playlist_id}")
-        failed_downloads: List[YouTube] = []
-
-        response = request.urlopen(album.thumbnail_url)
-        image_data = response.read()
-
-        final_destination = os.path.join(
+    def download_album(
+            self, 
+            album: Album, 
+            artist: str, 
+            image_data: bytes, 
+    ) -> Generator:
+        output_path = os.path.join(
             os.path.join(
                 self.output_path, sanitize_filename(artist)
             ), 
             sanitize_filename(album.title)
         )
+        os.makedirs(output_path, exist_ok=True)
 
-        os.makedirs(final_destination, exist_ok=True)
-
+        playlist = Playlist(url=f"{BaseURL.PLAYLIST.value}{album.playlist_id}")
         for i, url in enumerate(playlist):
             youtube = YouTube(url=url)
-
-            try:
-                stream = youtube.streams
-            except (
-                    MembersOnly, 
-                    RecordingUnavailable, 
-                    VideoPrivate, 
-                    VideoUnavailable,
-                    KeyError  # This is a bug in pytubefix I think.
-            ):
-                failed_downloads.append(youtube)
-                continue
-
-            audio_stream = stream.get_audio_only(subtype="mp4")
-
-            if not audio_stream:
-                failed_downloads.append(youtube)
-                continue
 
             song = Song(
                 title=youtube.title,
@@ -113,20 +89,39 @@ class Downloader:
             youtube.register_on_complete_callback(
                 lambda _, filepath: self._on_complete_callback(
                     song, 
-                    filepath  # type: ignore
-                    # pytubefix says that 'filepath' can be None, 
-                    # but this is not possible.
+                    filepath  # type: ignore | another problem with pytubefix ?
                 )
             )
 
             try:
-                audio_stream.download(
-                    output_path=final_destination,
-                    skip_existing=self.skip_existing,
-                    timeout=self.timeout,
-                    max_retries=self.max_retries
-                )
-            except (HTTPError, IncompleteRead):
-                failed_downloads.append(youtube)
+                self._download_song(youtube, output_path=output_path)
+            except (
+                    VideoUnavailable,
+                    IncompleteRead, 
+                    TimeoutError,
+                    EmptyStreamQuery,
+                    NoMP4StreamAvailable,
+                    HTTPError,
+                    KeyError # https://github.com/JuanBindez/pytubefix/issues/88
+            ) as err:
+                error = err
+            else:
+                error = None
 
-        return failed_downloads
+            yield song, error
+
+    def _download_song(self, youtube: YouTube, output_path: str) -> None:
+        streams = youtube.streams
+        if not len(streams):
+            raise EmptyStreamQuery(f"The song '{youtube.title}' did not provide any data streams")
+        else:
+            stream = streams.get_audio_only(subtype="mp4")
+            if stream is None:
+                raise NoMP4StreamAvailable("Unexpected status: MP4 stream unavailable")
+
+        stream.download(
+            output_path=output_path,
+            skip_existing=self.skip_existing,
+            timeout=self.timeout,
+            max_retries=self.max_retries
+        )
