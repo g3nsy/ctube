@@ -1,5 +1,5 @@
 import os
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from pathvalidate import sanitize_filename
 from http.client import IncompleteRead
 from enum import Enum
@@ -102,6 +102,7 @@ class Downloader:
                     EmptyStreamQuery,
                     NoMP4StreamAvailable,
                     HTTPError,
+                    URLError,
                     KeyError # https://github.com/JuanBindez/pytubefix/issues/88
             ) as err:
                 error = err
