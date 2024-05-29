@@ -38,7 +38,6 @@ def on_complete_callback(song: Song) -> None:
     mp4.export(output, format="mp3")
     set_metadata(filepath=output, song=song)
     os.remove(song.filepath)
-    print()
 
 
 def set_metadata(filepath: str, song: Song) -> None:
