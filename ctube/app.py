@@ -1,5 +1,6 @@
 import sys
 from typing import List, Optional, Tuple
+from urllib import request
 from urllib.error import URLError
 from innertube.clients import InnerTube
 from ctube.download import Downloader
@@ -36,6 +37,8 @@ class App:
             self, 
             output_path: str,
             skip_existing: bool = True,
+            timeout: int = 5,
+            max_retries: int = 3
     ):
         self.client = InnerTube("WEB_REMIX")
         self.prompt = Prompt()
@@ -43,7 +46,9 @@ class App:
             output_path=output_path, 
             skip_existing=skip_existing,
             on_complete_callback=on_complete_callback,
-            on_progress_callback=on_progress_callback
+            on_progress_callback=on_progress_callback,
+            timeout=timeout,
+            max_retries=max_retries
         )
 
         # last search
@@ -134,12 +139,23 @@ class App:
 
                 for album in albums:
                     write(f":: Downloading: {album.title}", Color.GREEN)
+
                     try:
-                        self.downloader.download(album=album, artist=self._artist_name)
-                    except (URLError, TimeoutError) as error:
-                        write(f"A connection error occurred while downloading: {album.title}", Color.RED)
-                        write(f"Reason: {str(error)}", Color.RED)
-                        break
+                        response = request.urlopen(album.thumbnail_url)
+                        image_data = response.read()
+                    except URLError:
+                        write(f"An error occurred while downloading {album.title} cover art", Color.RED)
+                        write(f"Skipping {album.title}", Color.YELLOW)
+                    else:
+                        for song, error in self.downloader.download_album(
+                                album=album, 
+                                artist=self._artist_name,
+                                image_data=image_data
+                        ):
+                            print()
+                            if error:
+                                write(f"An error occurred while downloading {song.title}", Color.RED)
+                                write(f"Reason: {str(error)}", Color.RED)
                 print('\033[?25h', end="")
 
     @staticmethod
