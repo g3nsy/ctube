@@ -18,7 +18,12 @@ request.default_range_size = request.default_range_size // 15
 
 
 def main() -> None:
-    app = App(output_path=MUSIC)
+    app = App(
+        output_path=MUSIC, 
+        skip_existing=False,
+        timeout=5,
+        max_retries=3
+    )
     app.main_loop()
     signal_handler()
 
