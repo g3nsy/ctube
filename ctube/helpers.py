@@ -46,7 +46,7 @@ def handle_connection_errors(func: Callable) -> Callable:
         except RequestError:
             write("Invalid request", Color.RED)
         except (ConnectTimeout, ReadTimeout):
-            write("An error occurred. try again.", Color.RED)
+            write("A timeout error occurred. Try again.", Color.RED)
         except (ConnectError, URLError):
             write("No internet connection", Color.RED)
     return inner
