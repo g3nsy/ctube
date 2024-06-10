@@ -1,8 +1,11 @@
+import ctube
 import sys
+from requests.exceptions import RequestException
 from typing import List, Optional, Tuple
 from urllib import request
 from urllib.error import URLError
 from innertube.clients import InnerTube
+from ctube.update import get_latest_version
 from ctube.download import Downloader
 from ctube.errors import InvalidIndexSyntax
 from ctube.terminal import Prompt
@@ -58,6 +61,16 @@ class App:
     def main_loop(self) -> None:
         clear_screen()
         print_header()
+        try:
+            latest_version = get_latest_version("ctube")
+        except RequestException:
+            pass
+        else:
+            if latest_version > ctube.__version__:
+                print(f"=> New version available: {latest_version}")
+                print(f"=> Close and run 'pip install -U ctube' to update.")
+            else:
+                print("=> ctube is up to date")
         while True:
             user_input = self.prompt.get_input().strip()
 
