@@ -47,6 +47,14 @@ class Command(Enum):
         )
     )
 
+    FILTER = _Command(
+        name="filter",
+        description=(
+            "Filter the previously listed multimedia contents\n"
+            "using the specified regular expression."
+        )
+    )
+
     EXIT = _Command(
         name="exit", 
         description="Exit the program."
