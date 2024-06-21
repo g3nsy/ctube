@@ -13,7 +13,8 @@ from ctube.containers import Album
 from ctube.colors import Color
 from ctube.cmds import Command
 from ctube.helpers import (
-    filter_albums, 
+    filter_albums_by_indexes, 
+    filter_albums_by_regex,
     handle_connection_errors,
     connected_to_internet
 )
@@ -24,7 +25,8 @@ from ctube.callbacks import (
 )
 from ctube.printers import (
     clear_screen,
-    print_albums,
+    print_albums_list,
+    print_albums_dict,
     print_header, 
     print_help, 
     write
@@ -97,6 +99,8 @@ class App:
                         self._id(args)
                     case Command.DOWNLOAD:
                         self._download(args)
+                    case Command.FILTER:
+                        self._filter(args)
 
     @handle_connection_errors
     def _search(self, artist_name: str) -> None:
@@ -124,8 +128,9 @@ class App:
             else:
                 artist_music_data: Tuple[List[Album], str]
                 self._albums, self._artist_name = artist_music_data
+                self._albums.sort(key=lambda x: x.title)
                 write(f"Collected music for {self._artist_name}", Color.GREEN)
-                print_albums(self._albums)
+                print_albums_list(self._albums)
 
     def _download(self, indexes: str):
         if not self._albums or not self._artist_name:
@@ -137,7 +142,7 @@ class App:
             write("No internet connection", Color.RED)
         else:
             try:
-                albums = filter_albums(self._albums, indexes)
+                albums = filter_albums_by_indexes(self._albums, indexes)
             except InvalidIndexSyntax as error:
                 write(str(error), Color.RED)
             else:
@@ -170,6 +175,19 @@ class App:
                                 write(f"An error occurred while downloading {song.title}", Color.RED)
                                 write(f"Reason: {str(error)}", Color.RED)
                 print('\033[?25h', end="")
+
+    def _filter(self, pattern: str) -> None:
+        if not self._albums or not self._artist_name:
+            write("You need to search for music first.", Color.RED)
+            write("Use the search/id command", Color.RED)
+        elif not pattern:
+            write("Missing argument: pattern", Color.RED)
+        else:
+            filtered_albums = filter_albums_by_regex(self._albums, pattern=pattern)
+            if filtered_albums:
+                print_albums_dict(filtered_albums)
+            else:
+                write(f"No match found", Color.RED)
 
     @staticmethod
     def _exit():
