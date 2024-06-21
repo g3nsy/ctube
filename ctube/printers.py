@@ -1,5 +1,5 @@
 import shutil
-from typing import List
+from typing import List, Dict
 import ctube
 from ctube.cmds import Command
 from ctube.colors import color, Color
@@ -23,19 +23,31 @@ def print_help() -> None:
         print()
 
 
-def print_albums(albums: List[Album]) -> None:
-    terminal_columns = shutil.get_terminal_size().columns
+def print_albums_list(albums: List[Album]) -> None:
     max_index_len = len(str(len(albums)))
-    space_for_title = terminal_columns - max_index_len - 3  # [, ], ' '
+    title_space = _get_title_space(max_index_len)
     for i, album in enumerate(albums):
-        if len(album.title) > space_for_title:
-            title = f"{album.title[:space_for_title - 3]}..."
-        else:
-            title = album.title
-        lb = color("[", Color.BLUE)
-        rb = color("]", Color.BLUE)
-        ci = color(str(i), Color.GREEN)
-        print(f"{lb}{ci}{rb}{' ' * (1 + max_index_len - len(str(i)))}{title}")
+        _print_album_title(i, album.title, title_space, max_index_len)
+
+
+def print_albums_dict(albums: Dict[int, Album]) -> None:
+    max_index_len = len(str(max(albums.keys())))
+    title_space = _get_title_space(max_index_len)
+    for i in albums:
+        _print_album_title(i, albums[i].title, title_space, max_index_len)
+
+
+def _get_title_space(max_index_len: int) -> int:
+    terminal_columns = shutil.get_terminal_size().columns
+    return terminal_columns - max_index_len - 3  # [, ], ' '
+
+def _print_album_title(index: int, title: str, title_space: int, max_index_len: int):
+    if len(title) > title_space:
+        title = f"{title[:title_space - 3]}..."
+    lb = color("[", Color.BLUE)
+    rb = color("]", Color.BLUE)
+    ci = color(str(index), Color.GREEN)
+    print(f"{lb}{ci}{rb}{' ' * (1 + max_index_len - len(str(index)))}{title}")
 
 
 def clear_screen() -> None:
