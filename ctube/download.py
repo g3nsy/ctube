@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Callable, Generator
 from ctube.containers import Album, Song
 from pytubefix import Playlist, Stream, YouTube
-from pytubefix.exceptions import VideoUnavailable
+from pytubefix.exceptions import VideoUnavailable, RegexMatchError
 from ctube.errors import NoMP4StreamAvailable, EmptyStreamQuery
 
 
@@ -103,9 +103,10 @@ class Downloader:
                     NoMP4StreamAvailable,
                     HTTPError,
                     URLError,
+                    RegexMatchError,
                     KeyError # https://github.com/JuanBindez/pytubefix/issues/88
             ) as err:
-                error = err
+                error = f"{err.__module__}.{err.__class__.__name__}.{err}"
             else:
                 error = None
 
