@@ -106,7 +106,11 @@ class Downloader:
                     RegexMatchError,
                     KeyError # https://github.com/JuanBindez/pytubefix/issues/88
             ) as err:
-                error = f"{err.__module__}.{err.__class__.__name__}.{err}"
+                # built-in exceptions do not have __module__ attr.
+                if hasattr(err, "__module__"):
+                    error = f"{err.__module__}.{err.__class__.__name__}: {err}"
+                else:
+                    error = f"{err.__class__.__name__}: {err}"
             else:
                 error = None
 
