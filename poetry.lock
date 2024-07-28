@@ -393,13 +393,13 @@ files = [
 
 [[package]]
 name = "pytubefix"
-version = "6.1.2"
+version = "6.6.3"
 description = "Python3 library for downloading YouTube Videos."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pytubefix-6.1.2-py3-none-any.whl", hash = "sha256:ca0b606b84c5ce91ccb04761d3dae00769b67cead6d938a32b0e650b2b867808"},
-    {file = "pytubefix-6.1.2.tar.gz", hash = "sha256:21881dadaf935c53004ebb108b3b228faad4ecd8f3f7192abb8e12e378a27215"},
+    {file = "pytubefix-6.6.3-py3-none-any.whl", hash = "sha256:d5a9e36d21c39dd60f8729ffe8b337b3dbea2e6269834710fb30bdcf05bf6f1b"},
+    {file = "pytubefix-6.6.3.tar.gz", hash = "sha256:f5827fe5fb9926280d53f660ac81cf08ad7526be296ef08d410695a3395062d8"},
 ]
 
 [[package]]
@@ -504,4 +504,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "58b4bdadff299e583d57ae3f54fd8e2c93cbd3141016477ef991a1c072f42a6a"
+content-hash = "1f3726259e139a1dfe08e3b8e8a546f4cc0086a0caac38d8b2aa67ed09f04775"
